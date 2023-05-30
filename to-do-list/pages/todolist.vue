@@ -6,7 +6,7 @@
         class="input-style"
         placeholder="Write a todo....."
         v-model="newItem"
-        @keyup.enter="addItem"
+        @keyup.enter="addItems"
       />
       <div class="list">
         <p
@@ -16,10 +16,7 @@
         >
           <span :class="{ linethrough: isDone(todo) }">{{ todo }}</span>
           <span
-            ><span
-              class="btn done-btn"
-              @click="markDone(todo)"
-              >Done</span
+            ><span class="btn done-btn" @click="markDone(todo)">Done</span
             ><span class="delete-btn btn" @click="deleteItem(index)"
               >Delete</span
             ></span
@@ -38,20 +35,40 @@ export default {
   task: "todolist",
   data() {
     return {
-      todos: ["A", "B", "C", "D"],
-      newItem: '',
+      todos: [] as any,
+      newItem: "",
       doneItems: new Set(),
     };
+  },
+
+  created() {
+    if(typeof window !== 'undefined'){
+      const savedArray = localStorage.getItem("todos");
+    if (savedArray) {
+      (this.todos as any) = JSON.parse(savedArray);
+    }
+    }
+   
+  },
+  watch: {
+    todos: {
+      handler(newArray) {
+        localStorage.setItem("todos", JSON.stringify(newArray));
+      },
+      deep: true,
+    },
   },
   methods: {
     deleteItem(index: any) {
       this.todos.splice(index, 1);
     },
-    addItem() {
-      if (this.newItem.trim() !== '') {
+    addItems() {
+      if (this.newItem.trim() !== "") {
         this.todos.push(this.newItem);
-        this.newItem = '';
+        localStorage.setItem("todos" ,this.todos );
+        this.newItem = "";
       }
+      // console.log(todos);
     },
     markDone(item: any) {
       if (this.isDone(item)) {
